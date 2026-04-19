@@ -41,3 +41,66 @@
 [2026-04-19T08:09:33.163Z] GET /api/drivers/DRV-001
 [2026-04-19T08:09:43.196Z] GET /api/drivers/DRV-001
 [2026-04-19T08:09:53.176Z] GET /api/drivers/DRV-001
+[2026-04-19T08:10:24.284Z] GET /api/drivers/DRV-001
+[2026-04-19T08:11:24.357Z] GET /api/drivers/DRV-001
+[WebSocket] New connection
+[WebSocket] New connection
+[WebSocket] Client registered: dashboard-e2e-1776586286819 (dashboard)
+[WebSocket] Client registered: driver-e2e-1776586286819 (driver)
+[WebSocket] New connection
+[WebSocket] New connection
+[WebSocket] Client registered: dashboard-e2e-trip-1776586294820 (dashboard)
+[WebSocket] Client registered: driver-e2e-trip-1776586294821 (driver)
+[WebSocket] New connection
+[WebSocket] New connection
+[WebSocket] Client registered: dashboard-e2e-hos-1776586302823 (dashboard)
+[WebSocket] Client registered: driver-e2e-hos-1776586302823 (driver)
+[WebSocket] Client disconnected: driver-e2e-hos-1776586302823
+[WebSocket] Client disconnected: dashboard-e2e-hos-1776586302823
+[WebSocket] New connection
+[WebSocket] New connection
+[WebSocket] New connection
+[WebSocket] New connection
+[WebSocket] Client registered: dashboard-e2e-multi-1776586303842 (dashboard)
+[WebSocket] Client registered: driver-e2e-multi-1-1776586303842 (driver)
+[WebSocket] Client registered: driver-e2e-multi-2-1776586303843 (driver)
+[WebSocket] Client registered: driver-e2e-multi-3-1776586303843 (driver)
+[WebSocket] Client disconnected: dashboard-e2e-multi-1776586303842
+[WebSocket] Client disconnected: driver-e2e-multi-2-1776586303843
+[WebSocket] Client disconnected: driver-e2e-multi-1-1776586303842
+[WebSocket] Client disconnected: driver-e2e-multi-3-1776586303843
+[WebSocket] New connection
+[WebSocket] Client registered: driver-e2e-reconnect-1776586311843 (driver)
+[WebSocket] Client disconnected: driver-e2e-reconnect-1776586311843
+[WebSocket] New connection
+[WebSocket] Client registered: driver-e2e-reconnect-1776586311843-reconnected (driver)
+[WebSocket] Client disconnected: driver-e2e-reconnect-1776586311843-reconnected
+[WebSocket] Client disconnected: dashboard-e2e-1776586286819
+[WebSocket] Client disconnected: driver-e2e-1776586286819
+[WebSocket] Client disconnected: dashboard-e2e-trip-1776586294820
+[WebSocket] Client disconnected: driver-e2e-trip-1776586294821
+Restarting 'server.js'
+[Store] Seeded: 18 drivers, 30 loads, 30 trips, 20 fuel receipts, 14 load board entries
+node:events:489
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1823:16)
+    at listenInCluster (node:net:1871:12)
+    at Server.listen (node:net:1959:7)
+    at file:///Users/chetan/GlobeHack/backend/server.js:143:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:192:25)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:511:28)
+    at emitErrorNT (node:net:1850:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.2.0
+Failed running 'server.js'

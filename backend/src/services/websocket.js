@@ -37,7 +37,7 @@ class WebSocketService {
   handleMessage(ws, data) {
     try {
       const message = JSON.parse(data);
-      const { type, clientId, clientType, driverId, userId, payload } = message;
+      const { type, clientId, clientType, driverId, userId, tripId, payload } = message;
 
       // Register client on first handshake
       if (type === 'register') {
@@ -53,15 +53,33 @@ class WebSocketService {
         return;
       }
 
-      // Relay messages based on type
+      // Relay messages based on type, preserving all metadata
       if (type === 'load:assigned') {
-        this.broadcastToDriver(driverId, { type: 'load:assigned', payload });
+        this.broadcastToDriver(driverId, {
+          type: 'load:assigned',
+          driverId,
+          payload,
+        });
       } else if (type === 'expense:logged') {
-        this.broadcastToDashboard({ type: 'expense:logged', driverId, payload });
+        this.broadcastToDashboard({
+          type: 'expense:logged',
+          driverId,
+          tripId,
+          payload,
+        });
       } else if (type === 'trip:completed') {
-        this.broadcastToDashboard({ type: 'trip:completed', driverId, payload });
+        this.broadcastToDashboard({
+          type: 'trip:completed',
+          driverId,
+          tripId,
+          payload,
+        });
       } else if (type === 'hos:updated') {
-        this.broadcastToDashboard({ type: 'hos:updated', driverId, payload });
+        this.broadcastToDashboard({
+          type: 'hos:updated',
+          driverId,
+          payload,
+        });
       }
     } catch (err) {
       console.error('[WebSocket] Message error:', err.message);
