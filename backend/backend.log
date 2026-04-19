@@ -1,0 +1,43 @@
+
+> dispatchiq-backend@1.0.0 dev
+> node --watch server.js
+
+(node:61124) ExperimentalWarning: Watch mode is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Store] Seeded: 18 drivers, 30 loads, 30 trips, 20 fuel receipts, 14 load board entries
+
+  ╔══════════════════════════════════════════╗
+  ║          DispatchIQ Backend v1.0         ║
+  ╠══════════════════════════════════════════╣
+  ║  Server:  http://localhost:3001          ║
+  ║  API:     http://localhost:3001/api      ║
+  ║  Health:  http://localhost:3001/api/health║
+  ║  WebSocket: ws://localhost:3001         ║
+  ╚══════════════════════════════════════════╝
+
+[WebSocket] New connection
+[WebSocket] Client registered: TEST-DRIVER-001 (driver)
+[WebSocket] Client disconnected: TEST-DRIVER-001
+[2026-04-19T08:07:15.027Z] POST /api/trips
+[2026-04-19T08:07:15.534Z] POST /api/expenses
+[Expense] Logged: fuel $45.5 for trip TRIP-001
+[2026-04-19T08:07:16.042Z] GET /api/expenses/trip/TRIP-001
+[2026-04-19T08:07:17.055Z] GET /api/expenses/stats
+[2026-04-19T08:07:24.236Z] GET /api/drivers/DRV-001
+[WebSocket] New connection
+[WebSocket] Client registered: TEST-DRIVER-001 (driver)
+[WebSocket] Client disconnected: TEST-DRIVER-001
+[2026-04-19T08:07:24.918Z] POST /api/trips
+[2026-04-19T08:07:25.421Z] POST /api/expenses
+[Expense] Logged: fuel $45.5 for trip TRIP-001
+[2026-04-19T08:07:25.925Z] GET /api/expenses/trip/TRIP-001
+[2026-04-19T08:07:26.932Z] GET /api/expenses/stats
+[2026-04-19T08:08:24.207Z] GET /api/drivers/DRV-001
+[2026-04-19T08:08:50.585Z] GET /api/drivers/DRV-001
+[2026-04-19T08:08:52.201Z] GET /api/drivers/DRV-001
+[2026-04-19T08:09:03.175Z] GET /api/drivers/DRV-001
+[2026-04-19T08:09:13.187Z] GET /api/drivers/DRV-001
+[2026-04-19T08:09:23.169Z] GET /api/drivers/DRV-001
+[2026-04-19T08:09:33.163Z] GET /api/drivers/DRV-001
+[2026-04-19T08:09:43.196Z] GET /api/drivers/DRV-001
+[2026-04-19T08:09:53.176Z] GET /api/drivers/DRV-001

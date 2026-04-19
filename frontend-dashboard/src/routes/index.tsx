@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { TopBar } from "@/components/TopBar";
 import { ChatPanel } from "@/components/ChatPanel";
+import { RealtimeExpenseTracker } from "@/components/RealtimeExpenseTracker";
+import { TripReportDisplay } from "@/components/TripReportDisplay";
 import { MapPin, Clock, Loader2, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -17,6 +19,7 @@ function FleetBoard() {
   const [data, setData] = useState<FleetReadiness | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'copilot' | 'expenses' | 'reports'>('copilot');
 
   const load = () => {
     setLoading(true);
@@ -104,7 +107,7 @@ function FleetBoard() {
           </div>
         </div>
 
-        {/* Ops assistant */}
+        {/* Ops assistant with tabs */}
         <div className="flex flex-1 min-w-0 flex-col gap-4 overflow-hidden p-5">
           <div className="grid grid-cols-4 gap-3">
             <StatChip label="Available" value={counts.clear} tone="success" />
@@ -117,35 +120,85 @@ function FleetBoard() {
             <StatChip label="Off Shift" value={counts.off_shift} tone="muted" />
           </div>
 
-          <div className="ops-card px-5 py-4 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-primary font-semibold">
-                Fleet Copilot
-              </p>
-              <h2 className="mt-1 text-lg font-semibold text-foreground">
-                Ask the board instead of scanning the map
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Check fleet status, HOS constraints, cost performance, and load
-                recommendations in plain English.
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-muted/25 px-3 py-2 text-right shrink-0">
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                Live snapshot
-              </div>
-              <div className="mt-1 text-sm font-medium text-foreground">
-                {driverSummary}
-              </div>
-            </div>
+          {/* Tab Navigation */}
+          <div className="flex gap-2 border-b border-border">
+            <button
+              onClick={() => setActiveTab('copilot')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'copilot'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              🤖 Copilot
+            </button>
+            <button
+              onClick={() => setActiveTab('expenses')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'expenses'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              💰 Live Expenses
+            </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'reports'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              📊 Trip Reports
+            </button>
           </div>
 
+          {/* Tab Content */}
           <div className="flex-1 min-h-0 overflow-hidden">
-            <ChatPanel
-              embedded
-              title="Fleet Operations Copilot"
-              subtitle="Online · Ask about drivers, HOS, loads, and costs"
-            />
+            {activeTab === 'copilot' && (
+              <>
+                <div className="ops-card px-5 py-4 flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.22em] text-primary font-semibold">
+                      Fleet Copilot
+                    </p>
+                    <h2 className="mt-1 text-lg font-semibold text-foreground">
+                      Ask the board instead of scanning the map
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Check fleet status, HOS constraints, cost performance, and load
+                      recommendations in plain English.
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/25 px-3 py-2 text-right shrink-0">
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                      Live snapshot
+                    </div>
+                    <div className="mt-1 text-sm font-medium text-foreground">
+                      {driverSummary}
+                    </div>
+                  </div>
+                </div>
+                <ChatPanel
+                  embedded
+                  title="Fleet Operations Copilot"
+                  subtitle="Online · Ask about drivers, HOS, loads, and costs"
+                />
+              </>
+            )}
+
+            {activeTab === 'expenses' && (
+              <div className="overflow-y-auto">
+                <RealtimeExpenseTracker />
+              </div>
+            )}
+
+            {activeTab === 'reports' && (
+              <div className="overflow-y-auto">
+                <TripReportDisplay />
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,0 +1,235 @@
+The Core Idea
+John captures everything during the trip. Maria gets a structured report after. No chasing. No phone calls. No missing receipts.
+John logs expense on road
+        ↓
+Receipt photo + amount captured
+        ↓
+Auto-categorized by type
+        ↓
+Trip completes
+        ↓
+Maria receives full trip report automatically
+
+App Structure — 5 Screens
+
+Screen 1: Home / Status
+The first thing John sees every morning.
+┌─────────────────────────────────┐
+│  Good morning, John 👋          │
+│  Sunday, Apr 19                 │
+│                                 │
+│  ┌──────────────────────────┐   │
+│  │  HOS REMAINING           │   │
+│  │  ████████████░░  9.2 hrs │   │
+│  │  Shift started: 6:00 AM  │   │
+│  └──────────────────────────┘   │
+│                                 │
+│  STATUS                         │
+│  ┌──────────┐  ┌──────────┐    │
+│  │ ✅ ON    │  │ ⚫ OFF   │    │
+│  │ SHIFT    │  │ SHIFT    │    │
+│  └──────────┘  └──────────┘    │
+│                                 │
+│  CURRENT LOAD                   │
+│  Phoenix → Dallas               │
+│  Pickup: 2:00 PM                │
+│  Drop: 11:00 PM                 │
+│                                 │
+│  ┌──────────┐  ┌──────────┐    │
+│  │ ACCEPT ✓ │  │  DROP ✗  │    │
+│  └──────────┘  └──────────┘    │
+└─────────────────────────────────┘
+
+Screen 2: Expense Logger (the main new screen)
+This is the heart of what you're adding. John logs every expense as it happens — fuel, food, tolls, parking, whatever.
+┌─────────────────────────────────┐
+│  + LOG EXPENSE                  │
+│                                 │
+│  CATEGORY                       │
+│  ┌────────┐ ┌────────┐         │
+│  │ ⛽ Fuel│ │ 🍔 Food│         │
+│  └────────┘ └────────┘         │
+│  ┌────────┐ ┌────────┐         │
+│  │🛣️ Toll │ │🅿️ Park │         │
+│  └────────┘ └────────┘         │
+│  ┌────────┐ ┌────────┐         │
+│  │🔧 Repair││ 📦 Other│        │
+│  └────────┘ └────────┘         │
+│                                 │
+│  AMOUNT                         │
+│  $ [__________]                 │
+│                                 │
+│  FUEL SPECIFIC (if fuel)        │
+│  Gallons: [______]              │
+│  Price/gal: [______]            │
+│  Station: [______]              │
+│                                 │
+│  NOTES (optional)               │
+│  [_________________________]    │
+│                                 │
+│  RECEIPT                        │
+│  ┌─────────────────────────┐   │
+│  │  📷 Take Photo          │   │
+│  │  OR                     │   │
+│  │  📁 Upload from Gallery │   │
+│  └─────────────────────────┘   │
+│                                 │
+│  [    SUBMIT EXPENSE    ]       │
+└─────────────────────────────────┘
+Expense Categories:
+
+⛽ Fuel — amount, gallons, price per gallon, station name
+🍔 Food / Meal — amount, receipt optional
+🛣️ Toll — amount, location auto-filled from GPS
+🅿️ Parking — amount, location auto-filled
+🔧 Repair / Maintenance — amount, description, receipt required
+🏨 Lodging — amount, receipt required
+📦 Other — amount, description, receipt optional
+
+Smart defaults:
+
+Location auto-filled from GPS on every expense
+Timestamp auto-filled
+Trip ID auto-attached — no manual linking needed
+
+
+Screen 3: Trip Expenses Summary
+John can see everything he's logged for the current trip in one view.
+┌─────────────────────────────────┐
+│  TRIP EXPENSES                  │
+│  Phoenix → Dallas               │
+│  Apr 19, 2026                   │
+│                                 │
+│  ⛽ Fuel          $187.40  📎   │
+│  ⛽ Fuel          $203.20  📎   │
+│  🍔 Food           $18.50       │
+│  🛣️ Toll            $4.75       │
+│  🅿️ Parking        $22.00  📎   │
+│  ─────────────────────────      │
+│  TOTAL            $435.85       │
+│                                 │
+│  Receipts uploaded: 3 of 5      │
+│  ⚠️ 2 expenses missing receipt  │
+│                                 │
+│  [  + ADD EXPENSE  ]            │
+└─────────────────────────────────┘
+
+Receipts show a paperclip icon when uploaded
+Missing receipts flagged in yellow — gentle reminder
+Total updates in real time as expenses are added
+
+
+Screen 4: HOS Logger
+Simple and fast. John inputs his hours. System calculates the rest.
+┌─────────────────────────────────┐
+│  HOS TRACKER                    │
+│                                 │
+│  Hours driven today             │
+│  [  1.8 hrs  ] ← / →           │
+│                                 │
+│  Shift started                  │
+│  [ 06:00 AM ]                   │
+│                                 │
+│  ┌──────────────────────────┐   │
+│  │  REMAINING TODAY         │   │
+│  │  9.2 hrs driving         │   │
+│  │  ████████████░░░░        │   │
+│  │                          │   │
+│  │  WEEKLY                  │   │
+│  │  52 / 70 hrs used        │   │
+│  │  ████████████████░░░░    │   │
+│  └──────────────────────────┘   │
+│                                 │
+│  🟢 You're clear for today's    │
+│     assigned trip (9 hrs)       │
+│                                 │
+│  [ UPDATE HOS ]                 │
+└─────────────────────────────────┘
+
+Screen 5: Voice Assistant
+Big, simple, always accessible.
+┌─────────────────────────────────┐
+│  VOICE ASSISTANT                │
+│                                 │
+│                                 │
+│         ┌───────────┐           │
+│         │           │           │
+│         │    🎙️     │           │
+│         │           │           │
+│         └───────────┘           │
+│      Hold to speak              │
+│                                 │
+│  QUICK COMMANDS                 │
+│  ┌──────────┐  ┌──────────┐    │
+│  │ STATUS   │  │  FUEL    │    │
+│  └──────────┘  └──────────┘    │
+│  ┌──────────┐  ┌──────────┐    │
+│  │ PARKING  │  │  HELP    │    │
+│  └──────────┘  └──────────┘    │
+│                                 │
+│  Last message:                  │
+│  "New load assigned. Phoenix    │
+│   to Dallas. Say ACCEPT to      │
+│   confirm."                     │
+└─────────────────────────────────┘
+
+Bottom Navigation Bar
+┌──────┬──────┬──────┬──────┬──────┐
+│  🏠  │  💰  │  📋  │  ⏱️  │  🎙️  │
+│ Home │Expense│ Trip │ HOS  │Voice │
+└──────┴──────┴──────┴──────┴──────┘
+
+The Structured Trip Report Maria Gets
+When John marks a trip complete — or it auto-completes at delivery — Maria gets this on her dashboard instantly:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TRIP REPORT #4821
+Phoenix AZ → Dallas TX
+Driver: John Torres
+Date: Apr 19, 2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TIMELINE
+Assigned:      8:45 AM
+Pickup:        2:03 PM  ✅ On time
+Delivery:      11:14 PM ✅ On time
+Total Duration: 9.3 hrs
+
+DISTANCE
+Total Miles:      892 mi
+Deadhead Miles:   12 mi (1.3%)
+Loaded Miles:     880 mi
+
+EXPENSES BREAKDOWN
+⛽ Fuel          $390.60  (2 receipts ✅)
+🍔 Food           $18.50  (no receipt)
+🛣️ Toll            $4.75  (auto-logged)
+🅿️ Parking        $22.00  (receipt ✅)
+─────────────────────────
+Total Expenses:  $435.85
+
+COST INTELLIGENCE
+Fuel cost/mile:    $0.44
+Total cost/mile:   $1.79
+Load revenue:      $2,100
+Net margin:        $1,664 (79%)
+vs fleet average:  +12% ✅
+
+HOS COMPLIANCE
+Hours driven:      9.3 / 11 max ✅
+Weekly total:      53.3 / 70 hrs ✅
+Violations:        NONE ✅
+
+DOCUMENTS
+BOL:    ✅ Uploaded 1:58 PM
+POD:    ✅ Uploaded 11:09 PM
+Fuel receipts: ✅ 2 uploaded
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AI SUMMARY
+This was an above-average trip.
+Cost per mile came in 8% below
+fleet average, driven by efficient
+fueling at Pilot I-20 vs Loves
+($0.11/gal cheaper). One expense
+(food $18.50) has no receipt —
+flag for reimbursement policy.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
