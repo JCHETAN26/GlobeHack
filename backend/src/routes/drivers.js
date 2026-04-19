@@ -155,6 +155,14 @@ router.patch('/:id/hos', asyncHandler(async (req, res) => {
 
   const result = updateDriverHOS(req.params.id, hosUpdate);
 
+  if (store.wsService) {
+    store.wsService.broadcastToDashboard({
+      type: 'hos:updated',
+      driverId: req.params.id,
+      payload: { ...result.driver.hos, status: result.status },
+    });
+  }
+
   res.json({
     message: 'HOS updated',
     driver: result.driver,

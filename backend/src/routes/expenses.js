@@ -44,12 +44,9 @@ router.post('/', asyncHandler(async (req, res) => {
     throw new ValidationError('amount is required and must be > 0');
   }
 
-  // Verify driver & trip exist
+  // Verify driver exists; trip is optional (may be in-transit with no completed trip yet)
   const driver = store.getDriver(driverId);
   if (!driver) throw new NotFoundError('Driver', driverId);
-
-  const trip = store.getTrip(tripId);
-  if (!trip) throw new NotFoundError('Trip', tripId);
 
   // Create expense record
   const expense = {
@@ -187,9 +184,8 @@ router.delete('/:id', asyncHandler(async (req, res) => {
   }
 
   const expense = store.expenses.get(id);
-  const trip = store.getTrip(expense.tripId);
+  const trip = expense.tripId ? store.getTrip(expense.tripId) : null;
 
-  // Prevent deletion if trip is completed
   if (trip && trip.completedAt) {
     throw new ValidationError('Cannot delete expenses from completed trips');
   }

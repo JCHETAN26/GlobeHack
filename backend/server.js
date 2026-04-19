@@ -18,6 +18,7 @@ import fuelRoutes from './src/routes/fuel.js';
 import fleetRoutes from './src/routes/fleet.js';
 import chatRoutes from './src/routes/chat.js';
 import expenseRoutes from './src/routes/expenses.js';
+import tripRoutes from './src/routes/trips.js';
 
 // Services
 import WebSocketService from './src/services/websocket.js';
@@ -55,6 +56,7 @@ app.use('/api/fuel', fuelRoutes);
 app.use('/api/fleet', fleetRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/trips', tripRoutes);
 
 // ─── Health Check ────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {

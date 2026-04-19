@@ -88,7 +88,7 @@ function AssignPage() {
         rate: parseFloat(rate),
       });
       setResult(data.recommendation);
-      setLoadId(data.load?.id || null);
+      setLoadId((data.load?.id as string) || null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {

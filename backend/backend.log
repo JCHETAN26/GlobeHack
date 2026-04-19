@@ -104,3 +104,28 @@ Emitted 'error' event on WebSocketServer instance at:
 
 Node.js v20.2.0
 Failed running 'server.js'
+Restarting 'server.js'
+[Store] Seeded: 18 drivers, 30 loads, 30 trips, 20 fuel receipts, 14 load board entries
+node:events:489
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1823:16)
+    at listenInCluster (node:net:1871:12)
+    at Server.listen (node:net:1959:7)
+    at file:///Users/chetan/GlobeHack/backend/server.js:143:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:192:25)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:511:28)
+    at emitErrorNT (node:net:1850:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v20.2.0
+Failed running 'server.js'

@@ -211,6 +211,15 @@ router.post('/:id/deliver', asyncHandler(async (req, res) => {
     throw new ConflictError(result.error);
   }
 
+  if (store.wsService && result.trip) {
+    store.wsService.broadcastToDashboard({
+      type: 'trip:completed',
+      driverId,
+      tripId: result.trip.id,
+      payload: result.trip,
+    });
+  }
+
   res.json(result);
 }));
 

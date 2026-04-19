@@ -3,6 +3,7 @@ import { TopBar } from "@/components/TopBar";
 import { ChatPanel } from "@/components/ChatPanel";
 import { RealtimeExpenseTracker } from "@/components/RealtimeExpenseTracker";
 import { TripReportDisplay } from "@/components/TripReportDisplay";
+import { RiskAlertBanner } from "@/components/RiskAlertBanner";
 import { MapPin, Clock, Loader2, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -109,6 +110,9 @@ function FleetBoard() {
 
         {/* Ops assistant with tabs */}
         <div className="flex flex-1 min-w-0 flex-col gap-4 overflow-hidden p-5">
+          {/* Risk Alert Banner */}
+          <RiskAlertBanner />
+
           <div className="grid grid-cols-4 gap-3">
             <StatChip label="Available" value={counts.clear} tone="success" />
             <StatChip label="Tight HOS" value={counts.tight} tone="warning" />

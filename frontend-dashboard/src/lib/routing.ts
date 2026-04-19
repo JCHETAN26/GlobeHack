@@ -37,7 +37,7 @@ async function fetchOpenRouteServiceRoute(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: OPENROUTESERVICE_API_KEY,
+        Authorization: OPENROUTESERVICE_API_KEY as string,
       },
       body: JSON.stringify({
         coordinates: [
