@@ -8,6 +8,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import http from 'http';
 
 // Routes
 import driverRoutes from './src/routes/drivers.js';
@@ -16,12 +17,24 @@ import dispatchRoutes from './src/routes/dispatch.js';
 import fuelRoutes from './src/routes/fuel.js';
 import fleetRoutes from './src/routes/fleet.js';
 import chatRoutes from './src/routes/chat.js';
+import expenseRoutes from './src/routes/expenses.js';
+
+// Services
+import WebSocketService from './src/services/websocket.js';
+
+// Store
+import store from './src/data/store.js';
 
 // Middleware
 import { errorHandler } from './src/middleware/errorHandler.js';
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 3001;
+
+// Initialize WebSocket service
+const wsService = new WebSocketService(server);
+store.wsService = wsService; // Attach to store for access in routes
 
 // ─── Global Middleware ───────────────────────────────────────────────────────
 app.use(cors());
@@ -41,6 +54,7 @@ app.use('/api/dispatch', dispatchRoutes);
 app.use('/api/fuel', fuelRoutes);
 app.use('/api/fleet', fleetRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/expenses', expenseRoutes);
 
 // ─── Health Check ────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
@@ -104,6 +118,8 @@ app.get('/api', (_req, res) => {
       chat: {
         'POST /api/chat': 'NLP dispatch assistant — natural language queries',
         'GET /api/chat/history': 'Conversation history (query: ?sessionId=default)',
+        'CHAT_PROVIDER': 'Set to auto, claude, or gemini',
+        'CLAUDE_API_KEY / GEMINI_API_KEY': 'Optional LLM providers for richer chat responses',
       },
     },
   });
@@ -124,7 +140,7 @@ app.use((_req, res) => {
 app.use(errorHandler);
 
 // ─── Start Server ────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log('');
   console.log('  ╔══════════════════════════════════════════╗');
   console.log('  ║          DispatchIQ Backend v1.0         ║');
@@ -132,6 +148,7 @@ app.listen(PORT, () => {
   console.log(`  ║  Server:  http://localhost:${PORT}          ║`);
   console.log(`  ║  API:     http://localhost:${PORT}/api      ║`);
   console.log(`  ║  Health:  http://localhost:${PORT}/api/health║`);
+  console.log(`  ║  WebSocket: ws://localhost:${PORT}         ║`);
   console.log('  ╚══════════════════════════════════════════╝');
   console.log('');
 });

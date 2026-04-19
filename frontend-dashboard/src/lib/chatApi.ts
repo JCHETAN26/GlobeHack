@@ -17,6 +17,9 @@ export interface ChatResponse {
   type: string;
   intent: string | null;
   timestamp: string;
+  provider?: string;
+  model?: string | null;
+  warning?: string;
   load?: {
     id: string;
     pickup: string;
@@ -27,6 +30,6 @@ export interface ChatResponse {
     type: string;
     rate: string;
   };
-  recommendation?: any;
+  recommendation?: Record<string, unknown>;
   driverId?: string;
 }

@@ -21,7 +21,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type DriverStatus = "clear" | "tight" | "ineligible" | "off_shift" | "assigned";
+export type DriverStatus =
+  | "clear"
+  | "tight"
+  | "ineligible"
+  | "off_shift"
+  | "assigned";
 
 export interface DriverHOS {
   remaining: number;
@@ -338,7 +343,10 @@ export function fetchDispatchRecommendation(input: {
   weight: number;
   type: string;
   rate: number;
-}): Promise<{ load: any; recommendation: DispatchRecommendation }> {
+}): Promise<{
+  load: Record<string, unknown>;
+  recommendation: DispatchRecommendation;
+}> {
   return request("/dispatch/recommend-new", {
     method: "POST",
     body: JSON.stringify(input),

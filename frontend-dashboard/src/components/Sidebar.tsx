@@ -11,14 +11,16 @@ const items = [
 export function Sidebar() {
   const { pathname } = useLocation();
   return (
-    <aside className="w-60 shrink-0 bg-sidebar border-r border-sidebar-border flex flex-col">
+    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="px-5 py-5 flex items-center gap-2 border-b border-sidebar-border">
         <div className="h-8 w-8 rounded-md bg-primary/15 border border-primary/40 flex items-center justify-center">
           <Truck className="h-4 w-4 text-primary" />
         </div>
-        <span className="text-white font-bold text-lg tracking-tight">DispatchIQ</span>
+        <span className="text-white font-bold text-lg tracking-tight">
+          DispatchIQ
+        </span>
       </div>
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {items.map((it) => {
           const active = pathname === it.to;
           const Icon = it.icon;

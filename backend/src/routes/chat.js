@@ -8,6 +8,7 @@
 
 import { Router } from 'express';
 import { processMessage } from '../engines/nlp.js';
+import { generateChatReply } from '../engines/llm.js';
 import { asyncHandler, ValidationError } from '../middleware/errorHandler.js';
 
 const router = Router();
@@ -41,14 +42,26 @@ router.post('/', asyncHandler(async (req, res) => {
 
   const trimmed = message.trim();
 
+  if (!conversations.has(sessionId)) {
+    conversations.set(sessionId, []);
+  }
+  const history = conversations.get(sessionId);
+
   // Process through NLP engine
   const result = processMessage(trimmed);
+  const llm = await generateChatReply({
+    message: trimmed,
+    history,
+    deterministicResult: result,
+  });
 
   // Build response
   const response = {
-    reply: result.message,
+    reply: llm.reply,
     type: result.type,
     intent: result.intent,
+    provider: llm.provider,
+    model: llm.model,
     timestamp: new Date().toISOString(),
   };
 
@@ -56,15 +69,18 @@ router.post('/', asyncHandler(async (req, res) => {
   if (result.load) response.load = result.load;
   if (result.recommendation) response.recommendation = result.recommendation;
   if (result.driver) response.driverId = result.driver;
+  if (llm.warning) response.warning = llm.warning;
 
   // Store in conversation history
-  if (!conversations.has(sessionId)) {
-    conversations.set(sessionId, []);
-  }
-  const history = conversations.get(sessionId);
   history.push(
     { role: 'user', content: trimmed, timestamp: new Date().toISOString() },
-    { role: 'assistant', content: result.message, type: result.type, timestamp: response.timestamp },
+    {
+      role: 'assistant',
+      content: llm.reply,
+      type: result.type,
+      provider: llm.provider,
+      timestamp: response.timestamp,
+    },
   );
   // Keep last 50 messages
   if (history.length > 50) {

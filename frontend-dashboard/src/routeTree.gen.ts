@@ -8,97 +8,97 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as HosRouteImport } from './routes/hos'
-import { Route as CostRouteImport } from './routes/cost'
-import { Route as AssignRouteImport } from './routes/assign'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as HosRouteImport } from "./routes/hos";
+import { Route as CostRouteImport } from "./routes/cost";
+import { Route as AssignRouteImport } from "./routes/assign";
+import { Route as IndexRouteImport } from "./routes/index";
 
 const HosRoute = HosRouteImport.update({
-  id: '/hos',
-  path: '/hos',
+  id: "/hos",
+  path: "/hos",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CostRoute = CostRouteImport.update({
-  id: '/cost',
-  path: '/cost',
+  id: "/cost",
+  path: "/cost",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AssignRoute = AssignRouteImport.update({
-  id: '/assign',
-  path: '/assign',
+  id: "/assign",
+  path: "/assign",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/assign': typeof AssignRoute
-  '/cost': typeof CostRoute
-  '/hos': typeof HosRoute
+  "/": typeof IndexRoute;
+  "/assign": typeof AssignRoute;
+  "/cost": typeof CostRoute;
+  "/hos": typeof HosRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/assign': typeof AssignRoute
-  '/cost': typeof CostRoute
-  '/hos': typeof HosRoute
+  "/": typeof IndexRoute;
+  "/assign": typeof AssignRoute;
+  "/cost": typeof CostRoute;
+  "/hos": typeof HosRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/assign': typeof AssignRoute
-  '/cost': typeof CostRoute
-  '/hos': typeof HosRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/assign": typeof AssignRoute;
+  "/cost": typeof CostRoute;
+  "/hos": typeof HosRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/assign' | '/cost' | '/hos'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/assign' | '/cost' | '/hos'
-  id: '__root__' | '/' | '/assign' | '/cost' | '/hos'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "/" | "/assign" | "/cost" | "/hos";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "/" | "/assign" | "/cost" | "/hos";
+  id: "__root__" | "/" | "/assign" | "/cost" | "/hos";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AssignRoute: typeof AssignRoute
-  CostRoute: typeof CostRoute
-  HosRoute: typeof HosRoute
+  IndexRoute: typeof IndexRoute;
+  AssignRoute: typeof AssignRoute;
+  CostRoute: typeof CostRoute;
+  HosRoute: typeof HosRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/hos': {
-      id: '/hos'
-      path: '/hos'
-      fullPath: '/hos'
-      preLoaderRoute: typeof HosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cost': {
-      id: '/cost'
-      path: '/cost'
-      fullPath: '/cost'
-      preLoaderRoute: typeof CostRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/assign': {
-      id: '/assign'
-      path: '/assign'
-      fullPath: '/assign'
-      preLoaderRoute: typeof AssignRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/hos": {
+      id: "/hos";
+      path: "/hos";
+      fullPath: "/hos";
+      preLoaderRoute: typeof HosRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/cost": {
+      id: "/cost";
+      path: "/cost";
+      fullPath: "/cost";
+      preLoaderRoute: typeof CostRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/assign": {
+      id: "/assign";
+      path: "/assign";
+      fullPath: "/assign";
+      preLoaderRoute: typeof AssignRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
@@ -107,7 +107,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssignRoute: AssignRoute,
   CostRoute: CostRoute,
   HosRoute: HosRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();

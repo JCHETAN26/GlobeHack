@@ -1,5 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles, Bot, User, Minimize2 } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Send,
+  Loader2,
+  Sparkles,
+  Bot,
+  User,
+  Minimize2,
+} from "lucide-react";
 import { sendChatMessage, type ChatResponse } from "@/lib/chatApi";
 
 interface Message {
@@ -19,8 +28,16 @@ const SUGGESTIONS = [
   "Show me fleet status",
 ];
 
-export function ChatPanel() {
-  const [open, setOpen] = useState(false);
+export function ChatPanel({
+  embedded = false,
+  title = "DispatchIQ Assistant",
+  subtitle = "Online · Natural language dispatch",
+}: {
+  embedded?: boolean;
+  title?: string;
+  subtitle?: string;
+}) {
+  const [open, setOpen] = useState(embedded);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,6 +50,12 @@ export function ChatPanel() {
       inputRef.current.focus();
     }
   }, [open]);
+
+  useEffect(() => {
+    if (embedded) {
+      setOpen(true);
+    }
+  }, [embedded]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -66,11 +89,12 @@ export function ChatPanel() {
         load: response.load,
       };
       setMessages((prev) => [...prev, aiMsg]);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
       const errorMsg: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: `⚠️ Error: ${err.message}\n\nMake sure the backend is running on port 3001.`,
+        content: `⚠️ Error: ${errorMessage}\n\nMake sure the backend is running on port 3001.`,
         type: "error",
         timestamp: new Date().toISOString(),
       };
@@ -87,8 +111,7 @@ export function ChatPanel() {
     }
   };
 
-  // Floating button when closed
-  if (!open) {
+  if (!embedded && !open) {
     return (
       <button
         onClick={() => setOpen(true)}
@@ -107,49 +130,72 @@ export function ChatPanel() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-[440px] h-[640px] flex flex-col rounded-2xl border border-border bg-background shadow-2xl shadow-black/30 overflow-hidden animate-in slide-in-from-bottom-4 duration-200">
+    <div
+      className={
+        embedded
+          ? "flex h-full flex-col overflow-hidden rounded-xl border border-border bg-background shadow-inner"
+          : "fixed bottom-6 right-6 z-50 flex h-[640px] w-[440px] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl shadow-black/30 animate-in slide-in-from-bottom-4 duration-200"
+      }
+    >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 bg-sidebar border-b border-sidebar-border">
         <div className="h-8 w-8 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center">
           <Sparkles className="h-4 w-4 text-primary" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-white">DispatchIQ Assistant</h3>
+          <h3 className="text-sm font-bold text-white">{title}</h3>
           <p className="text-[10px] text-muted-foreground flex items-center gap-1">
             <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
-            Online · Natural language dispatch
+            {subtitle}
           </p>
         </div>
-        <button
-          onClick={() => setOpen(false)}
-          className="h-7 w-7 rounded-md hover:bg-sidebar-accent flex items-center justify-center transition-colors"
-        >
-          <Minimize2 className="h-3.5 w-3.5 text-muted-foreground" />
-        </button>
-        <button
-          onClick={() => { setOpen(false); setMessages([]); setShowSuggestions(true); }}
-          className="h-7 w-7 rounded-md hover:bg-sidebar-accent flex items-center justify-center transition-colors"
-        >
-          <X className="h-3.5 w-3.5 text-muted-foreground" />
-        </button>
+        {!embedded && (
+          <>
+            <button
+              onClick={() => setOpen(false)}
+              className="h-7 w-7 rounded-md hover:bg-sidebar-accent flex items-center justify-center transition-colors"
+            >
+              <Minimize2 className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+            <button
+              onClick={() => {
+                setOpen(false);
+                setMessages([]);
+                setShowSuggestions(true);
+              }}
+              className="h-7 w-7 rounded-md hover:bg-sidebar-accent flex items-center justify-center transition-colors"
+            >
+              <X className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto px-4 py-3 space-y-4"
+      >
         {messages.length === 0 && (
           <div className="text-center pt-8">
             <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-4">
               <Bot className="h-7 w-7 text-primary" />
             </div>
-            <h4 className="text-sm font-bold text-foreground">Hey! I'm your dispatch AI.</h4>
+            <h4 className="text-sm font-bold text-foreground">
+              Hey! I'm your dispatch AI.
+            </h4>
             <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed max-w-[280px] mx-auto">
-              Ask me anything — find drivers, check HOS, pull costs. Just type in plain English.
+              Ask me anything — find drivers, check HOS, pull costs. Just type
+              in plain English.
             </p>
           </div>
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : ""}`}>
+          <div
+            key={msg.id}
+            className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : ""}`}
+          >
             {msg.role === "assistant" && (
               <div className="h-6 w-6 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center shrink-0 mt-0.5">
                 <Bot className="h-3.5 w-3.5 text-primary" />
@@ -169,13 +215,19 @@ export function ChatPanel() {
               )}
               {msg.load && (
                 <div className="mt-2 pt-2 border-t border-border/50 flex items-center gap-2 text-[10px] text-muted-foreground">
-                  <span className="font-medium text-foreground/70">{msg.load.pickup}</span>
+                  <span className="font-medium text-foreground/70">
+                    {msg.load.pickup}
+                  </span>
                   <span>→</span>
-                  <span className="font-medium text-foreground/70">{msg.load.dropoff}</span>
+                  <span className="font-medium text-foreground/70">
+                    {msg.load.dropoff}
+                  </span>
                   <span>·</span>
                   <span>{msg.load.distance}</span>
                   <span>·</span>
-                  <span className="font-bold text-success">{msg.load.rate}</span>
+                  <span className="font-bold text-success">
+                    {msg.load.rate}
+                  </span>
                 </div>
               )}
             </div>
@@ -194,9 +246,18 @@ export function ChatPanel() {
             </div>
             <div className="bg-muted/60 border border-border rounded-xl rounded-bl-sm px-4 py-3">
               <div className="flex items-center gap-1.5">
-                <div className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: "0ms" }} />
-                <div className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: "150ms" }} />
-                <div className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: "300ms" }} />
+                <div
+                  className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce"
+                  style={{ animationDelay: "0ms" }}
+                />
+                <div
+                  className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce"
+                  style={{ animationDelay: "150ms" }}
+                />
+                <div
+                  className="h-1.5 w-1.5 rounded-full bg-primary/60 animate-bounce"
+                  style={{ animationDelay: "300ms" }}
+                />
               </div>
             </div>
           </div>
@@ -206,7 +267,9 @@ export function ChatPanel() {
       {/* Suggestions */}
       {showSuggestions && messages.length === 0 && (
         <div className="px-4 pb-2">
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium mb-2">Try asking…</p>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium mb-2">
+            Try asking…
+          </p>
           <div className="flex flex-wrap gap-1.5">
             {SUGGESTIONS.map((s) => (
               <button
@@ -247,7 +310,9 @@ export function ChatPanel() {
           </button>
         </div>
         <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
-          Powered by DispatchIQ NLP · Type <span className="font-medium text-foreground/60">help</span> for commands
+          Powered by DispatchIQ NLP · Type{" "}
+          <span className="font-medium text-foreground/60">help</span> for
+          commands
         </p>
       </div>
     </div>
@@ -269,18 +334,24 @@ function MarkdownContent({ content }: { content: string }) {
     // Headers
     if (line.startsWith("## ")) {
       elements.push(
-        <h3 key={i} className="text-sm font-bold mt-2 mb-1 flex items-center gap-1.5">
+        <h3
+          key={i}
+          className="text-sm font-bold mt-2 mb-1 flex items-center gap-1.5"
+        >
           {line.slice(3)}
-        </h3>
+        </h3>,
       );
       i++;
       continue;
     }
     if (line.startsWith("### ")) {
       elements.push(
-        <h4 key={i} className="text-xs font-bold text-foreground/90 mt-2 mb-1 uppercase tracking-wide">
+        <h4
+          key={i}
+          className="text-xs font-bold text-foreground/90 mt-2 mb-1 uppercase tracking-wide"
+        >
           {line.slice(4)}
-        </h4>
+        </h4>,
       );
       i++;
       continue;
@@ -294,7 +365,10 @@ function MarkdownContent({ content }: { content: string }) {
       }
       // Skip separator rows
       if (!/^\|[-\s|]+\|$/.test(line)) {
-        const cells = line.split("|").slice(1, -1).map((c) => c.trim());
+        const cells = line
+          .split("|")
+          .slice(1, -1)
+          .map((c) => c.trim());
         tableRows.push(cells);
       }
       // Check if next line continues table
@@ -303,13 +377,19 @@ function MarkdownContent({ content }: { content: string }) {
         inTable = false;
         const isHeaderPresent = tableRows.length > 1;
         elements.push(
-          <div key={i} className="my-1.5 overflow-x-auto rounded-md border border-border">
+          <div
+            key={i}
+            className="my-1.5 overflow-x-auto rounded-md border border-border"
+          >
             <table className="w-full text-[11px]">
               {isHeaderPresent && (
                 <thead>
                   <tr className="bg-muted/40">
                     {tableRows[0].map((cell, ci) => (
-                      <th key={ci} className="text-left font-semibold px-2 py-1 text-muted-foreground">
+                      <th
+                        key={ci}
+                        className="text-left font-semibold px-2 py-1 text-muted-foreground"
+                      >
                         {renderInline(cell)}
                       </th>
                     ))}
@@ -328,7 +408,7 @@ function MarkdownContent({ content }: { content: string }) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </div>,
         );
       }
       i++;
@@ -338,10 +418,13 @@ function MarkdownContent({ content }: { content: string }) {
     // Bullet list
     if (line.startsWith("- ")) {
       elements.push(
-        <div key={i} className="flex items-start gap-1.5 text-[12px] leading-relaxed ml-1">
+        <div
+          key={i}
+          className="flex items-start gap-1.5 text-[12px] leading-relaxed ml-1"
+        >
           <span className="text-muted-foreground mt-0.5 shrink-0">•</span>
           <span>{renderInline(line.slice(2))}</span>
-        </div>
+        </div>,
       );
       i++;
       continue;
@@ -350,9 +433,12 @@ function MarkdownContent({ content }: { content: string }) {
     // Blockquote
     if (line.startsWith("> ")) {
       elements.push(
-        <div key={i} className="border-l-2 border-primary/40 pl-2.5 text-[11px] text-foreground/80 italic my-1">
+        <div
+          key={i}
+          className="border-l-2 border-primary/40 pl-2.5 text-[11px] text-foreground/80 italic my-1"
+        >
           {renderInline(line.slice(2))}
-        </div>
+        </div>,
       );
       i++;
       continue;
@@ -368,7 +454,7 @@ function MarkdownContent({ content }: { content: string }) {
     elements.push(
       <p key={i} className="text-[12px] leading-relaxed">
         {renderInline(line)}
-      </p>
+      </p>,
     );
     i++;
   }
@@ -388,12 +474,14 @@ function renderInline(text: string): React.ReactNode {
     const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
     if (boldMatch && boldMatch.index !== undefined) {
       if (boldMatch.index > 0) {
-        parts.push(<span key={key++}>{remaining.slice(0, boldMatch.index)}</span>);
+        parts.push(
+          <span key={key++}>{remaining.slice(0, boldMatch.index)}</span>,
+        );
       }
       parts.push(
         <span key={key++} className="font-bold text-foreground">
           {boldMatch[1]}
-        </span>
+        </span>,
       );
       remaining = remaining.slice(boldMatch.index + boldMatch[0].length);
       continue;
@@ -403,12 +491,17 @@ function renderInline(text: string): React.ReactNode {
     const codeMatch = remaining.match(/`(.+?)`/);
     if (codeMatch && codeMatch.index !== undefined) {
       if (codeMatch.index > 0) {
-        parts.push(<span key={key++}>{remaining.slice(0, codeMatch.index)}</span>);
+        parts.push(
+          <span key={key++}>{remaining.slice(0, codeMatch.index)}</span>,
+        );
       }
       parts.push(
-        <code key={key++} className="bg-muted px-1 py-0.5 rounded text-[10px] font-mono text-primary">
+        <code
+          key={key++}
+          className="bg-muted px-1 py-0.5 rounded text-[10px] font-mono text-primary"
+        >
           {codeMatch[1]}
-        </code>
+        </code>,
       );
       remaining = remaining.slice(codeMatch.index + codeMatch[0].length);
       continue;
@@ -418,12 +511,14 @@ function renderInline(text: string): React.ReactNode {
     const italicMatch = remaining.match(/_(.+?)_/);
     if (italicMatch && italicMatch.index !== undefined) {
       if (italicMatch.index > 0) {
-        parts.push(<span key={key++}>{remaining.slice(0, italicMatch.index)}</span>);
+        parts.push(
+          <span key={key++}>{remaining.slice(0, italicMatch.index)}</span>,
+        );
       }
       parts.push(
         <em key={key++} className="text-foreground/70">
           {italicMatch[1]}
-        </em>
+        </em>,
       );
       remaining = remaining.slice(italicMatch.index + italicMatch[0].length);
       continue;

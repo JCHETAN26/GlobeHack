@@ -1,14 +1,31 @@
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  useMap,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
+import { Loader2, Route as RouteIcon, TriangleAlert } from "lucide-react";
+import {
+  formatRouteDistance,
+  formatRouteDuration,
+} from "@/lib/routing";
+import { useTruckRoute } from "@/hooks/useTruckRoute";
 
 // Fix Leaflet marker icons
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
 interface Location {
@@ -86,7 +103,15 @@ const driverIcon = L.icon({
 });
 
 // Component to fit bounds
-function FitBounds({ pickup, dropoff, driver }: { pickup: Location; dropoff: Location; driver?: Location }) {
+function FitBounds({
+  pickup,
+  dropoff,
+  driver,
+}: {
+  pickup: Location;
+  dropoff: Location;
+  driver?: Location;
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -105,23 +130,69 @@ function FitBounds({ pickup, dropoff, driver }: { pickup: Location; dropoff: Loc
   return null;
 }
 
-export function RouteMap({ pickup, dropoff, driverLocation, title = "Route Map" }: RouteMapProps) {
+export function RouteMap({
+  pickup,
+  dropoff,
+  driverLocation,
+  title = "Route Map",
+}: RouteMapProps) {
+  const { route, loading, error } = useTruckRoute(pickup, dropoff);
   const center: [number, number] = [
     (pickup.lat + dropoff.lat) / 2,
     (pickup.lng + dropoff.lng) / 2,
   ];
-
-  const routeLine: [number, number][] = [
-    [pickup.lat, pickup.lng],
-    [dropoff.lat, dropoff.lng],
-  ];
+  const routeLine: [number, number][] =
+    route?.coordinates.length
+      ? route.coordinates
+      : [
+          [pickup.lat, pickup.lng],
+          [dropoff.lat, dropoff.lng],
+        ];
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="px-4 py-3 border-b border-border">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold">{title}</h3>
+        <div className="flex items-center gap-2 text-[11px]">
+          {loading && (
+            <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Routing…
+            </span>
+          )}
+          {error && !loading && (
+            <span className="inline-flex items-center gap-1.5 text-warning">
+              <TriangleAlert className="h-3.5 w-3.5" />
+              Straight-line fallback
+            </span>
+          )}
+          {route && !loading && (
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/30 px-2 py-1 text-foreground">
+              <RouteIcon className="h-3.5 w-3.5 text-primary" />
+              {formatRouteDistance(route.distanceMeters)} ·{" "}
+              {formatRouteDuration(route.durationSeconds)}
+            </span>
+          )}
+        </div>
       </div>
       <div className="flex-1 relative">
+        {route && (
+          <div className="absolute left-4 top-4 z-[400] rounded-md border border-border bg-background/85 px-3 py-2 backdrop-blur">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+              {route.truckAware ? "Truck Route" : "Road Route"}
+            </div>
+            <div className="mt-1 text-sm font-semibold text-foreground">
+              {formatRouteDistance(route.distanceMeters)} ·{" "}
+              {formatRouteDuration(route.durationSeconds)}
+            </div>
+            <div className="mt-1 text-[11px] text-muted-foreground">
+              {route.truckAware
+                ? "Uses heavy-vehicle routing rules"
+                : "Shortest drivable route fallback"}
+            </div>
+          </div>
+        )}
+
         <MapContainer
           center={center}
           zoom={6}
@@ -137,9 +208,9 @@ export function RouteMap({ pickup, dropoff, driverLocation, title = "Route Map" 
           <Polyline
             positions={routeLine}
             color="#3b82f6"
-            weight={3}
-            opacity={0.8}
-            dashArray="5, 5"
+            weight={4}
+            opacity={0.85}
+            dashArray={route ? undefined : "5, 5"}
           />
 
           {/* Pickup marker (Point A) */}
@@ -147,7 +218,9 @@ export function RouteMap({ pickup, dropoff, driverLocation, title = "Route Map" 
             <Popup>
               <div className="text-sm">
                 <p className="font-semibold">Pickup (A)</p>
-                <p className="text-xs text-muted-foreground">{pickup.address || pickup.city}</p>
+                <p className="text-xs text-muted-foreground">
+                  {pickup.address || pickup.city}
+                </p>
               </div>
             </Popup>
           </Marker>
@@ -157,25 +230,36 @@ export function RouteMap({ pickup, dropoff, driverLocation, title = "Route Map" 
             <Popup>
               <div className="text-sm">
                 <p className="font-semibold">Dropoff (B)</p>
-                <p className="text-xs text-muted-foreground">{dropoff.address || dropoff.city}</p>
+                <p className="text-xs text-muted-foreground">
+                  {dropoff.address || dropoff.city}
+                </p>
               </div>
             </Popup>
           </Marker>
 
           {/* Driver location marker (if provided) */}
           {driverLocation && (
-            <Marker position={[driverLocation.lat, driverLocation.lng]} icon={driverIcon}>
+            <Marker
+              position={[driverLocation.lat, driverLocation.lng]}
+              icon={driverIcon}
+            >
               <Popup>
                 <div className="text-sm">
                   <p className="font-semibold">Driver Location</p>
-                  <p className="text-xs text-muted-foreground">{driverLocation.address || "Current location"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {driverLocation.address || "Current location"}
+                  </p>
                 </div>
               </Popup>
             </Marker>
           )}
 
           {/* Fit all points in view */}
-          <FitBounds pickup={pickup} dropoff={dropoff} driver={driverLocation} />
+          <FitBounds
+            pickup={pickup}
+            dropoff={dropoff}
+            driver={driverLocation}
+          />
         </MapContainer>
       </div>
     </div>

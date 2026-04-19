@@ -4,11 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    tsconfigPaths(),
-  ],
+  plugins: [react(), tailwindcss(), tsconfigPaths()],
   server: {
     port: 5173,
     strictPort: false,

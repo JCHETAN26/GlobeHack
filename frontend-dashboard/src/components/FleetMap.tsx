@@ -1,7 +1,16 @@
 import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  useMap,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useTruckRoute } from "@/hooks/useTruckRoute";
+import { formatRouteDistance, formatRouteDuration } from "@/lib/routing";
 
 interface DriverMapData {
   id: string;
@@ -25,10 +34,10 @@ interface DriverMapData {
 const createIcon = (colorClass: string) => {
   // Map our Tailwind colors to standard hex for the SVG stroke/fill
   const hexMap: Record<string, string> = {
-    "text-success": "#10b981",    // Emerald 500
-    "text-warning": "#f59e0b",    // Amber 500
-    "text-danger": "#ef4444",     // Red 500
-    "text-primary": "#facc15",    // Yellow 400 (Assigned)
+    "text-success": "#10b981", // Emerald 500
+    "text-warning": "#f59e0b", // Amber 500
+    "text-danger": "#ef4444", // Red 500
+    "text-primary": "#facc15", // Yellow 400 (Assigned)
     "text-muted-foreground": "#9ca3af", // Gray 400
   };
 
@@ -60,7 +69,13 @@ const ICONS = {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function FleetMap({ drivers, title }: { drivers: DriverMapData[]; title?: string }) {
+export function FleetMap({
+  drivers,
+  title,
+}: {
+  drivers: DriverMapData[];
+  title?: string;
+}) {
   // Center roughly on Arizona/Southwest
   const center: [number, number] = [34.0, -111.0];
 
@@ -77,16 +92,28 @@ export function FleetMap({ drivers, title }: { drivers: DriverMapData[]; title?:
       {/* Map Key */}
       <div className="absolute top-4 right-4 z-[400] bg-background/80 backdrop-blur border border-border px-3 py-2 rounded-md shadow-sm hidden sm:block">
         <div className="flex gap-3 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-          <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-success ring-2 ring-success/30" /> Clear</span>
-          <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary ring-2 ring-primary/30" /> Assigned</span>
-          <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-warning ring-2 ring-warning/30" /> Tight</span>
-          <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-danger ring-2 ring-danger/30" /> Ineligible</span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-success ring-2 ring-success/30" />{" "}
+            Clear
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-primary ring-2 ring-primary/30" />{" "}
+            Assigned
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-warning ring-2 ring-warning/30" />{" "}
+            Tight
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-danger ring-2 ring-danger/30" />{" "}
+            Ineligible
+          </span>
         </div>
       </div>
 
-      <MapContainer 
-        center={center} 
-        zoom={6} 
+      <MapContainer
+        center={center}
+        zoom={6}
         className="h-full w-full"
         zoomControl={true}
         scrollWheelZoom={true}
@@ -105,54 +132,173 @@ export function FleetMap({ drivers, title }: { drivers: DriverMapData[]; title?:
 
           return (
             <div key={driver.id}>
-               {/* Note: Leaflet expects [lat, lng] arrays */}
-              <Marker position={[driver.lat, driver.lng]} icon={ICONS[driver.status]}>
+              {/* Note: Leaflet expects [lat, lng] arrays */}
+              <Marker
+                position={[driver.lat, driver.lng]}
+                icon={ICONS[driver.status]}
+              >
                 <Popup className="dispatch-popup">
                   <div className="p-1 min-w-[180px]">
                     <div className="flex items-center gap-2 mb-2">
-                       <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center font-bold text-primary text-xs shrink-0">
-                        {driver.name.split(" ").map(n => n[0]).join("")}
-                       </div>
-                       <div>
-                         <h4 className="font-bold text-sm leading-tight text-foreground">{driver.name}</h4>
-                         <p className="text-[10px] text-muted-foreground uppercase">{driver.status.replace("_", " ")}</p>
-                       </div>
+                      <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center font-bold text-primary text-xs shrink-0">
+                        {driver.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm leading-tight text-foreground">
+                          {driver.name}
+                        </h4>
+                        <p className="text-[10px] text-muted-foreground uppercase">
+                          {driver.status.replace("_", " ")}
+                        </p>
+                      </div>
                     </div>
-                    
+
                     <div className="space-y-1.5 text-xs">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Location:</span>
-                        <span className="font-medium text-foreground">{driver.location}</span>
+                        <span className="font-medium text-foreground">
+                          {driver.location}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">HOS Left:</span>
-                        <span className="font-medium text-foreground">{driver.hosRemaining} hrs</span>
+                        <span className="font-medium text-foreground">
+                          {driver.hosRemaining} hrs
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Activity:</span>
-                        <span className="font-medium text-foreground truncate max-w-[100px]" title={driver.load}>{driver.load}</span>
+                        <span
+                          className="font-medium text-foreground truncate max-w-[100px]"
+                          title={driver.load}
+                        >
+                          {driver.load}
+                        </span>
                       </div>
                     </div>
+
+                    {hasRoute && (
+                      <RouteSummary
+                        start={{ lat: driver.lat, lng: driver.lng }}
+                        pickup={driver.activeRoute!.pickup}
+                        dropoff={driver.activeRoute!.dropoff}
+                      />
+                    )}
                   </div>
                 </Popup>
               </Marker>
 
-              {/* Draw polyline A -> B for the current dispatch load */}
               {hasRoute && (
-                <Polyline 
-                  positions={[
-                    [driver.activeRoute!.pickup.lat, driver.activeRoute!.pickup.lng],
-                    [driver.activeRoute!.dropoff.lat, driver.activeRoute!.dropoff.lng]
-                  ]}
-                  pathOptions={{ color: '#facc15', weight: 3, dashArray: '5, 10', opacity: 0.8 }}
+                <DriverRouteLine
+                  driver={driver}
+                  pickup={driver.activeRoute!.pickup}
+                  dropoff={driver.activeRoute!.dropoff}
                 />
               )}
             </div>
           );
         })}
-        
+
         <FitMapBounds drivers={drivers} />
       </MapContainer>
+    </div>
+  );
+}
+
+function DriverRouteLine({
+  driver,
+  pickup,
+  dropoff,
+}: {
+  driver: Pick<DriverMapData, "lat" | "lng">;
+  pickup: { lat: number; lng: number };
+  dropoff: { lat: number; lng: number };
+}) {
+  const toPickup = useTruckRoute(
+    { lat: driver.lat, lng: driver.lng },
+    { lat: pickup.lat, lng: pickup.lng },
+  );
+  const toDropoff = useTruckRoute(
+    { lat: pickup.lat, lng: pickup.lng },
+    { lat: dropoff.lat, lng: dropoff.lng },
+  );
+
+  const firstLeg =
+    toPickup.route?.coordinates.length
+      ? toPickup.route.coordinates
+      : [
+          [driver.lat, driver.lng] as [number, number],
+          [pickup.lat, pickup.lng] as [number, number],
+        ];
+  const secondLeg =
+    toDropoff.route?.coordinates.length
+      ? toDropoff.route.coordinates
+      : [
+          [pickup.lat, pickup.lng] as [number, number],
+          [dropoff.lat, dropoff.lng] as [number, number],
+        ];
+
+  return (
+    <>
+      <Polyline
+        positions={firstLeg}
+        pathOptions={{
+          color: "#60a5fa",
+          weight: 3,
+          dashArray: toPickup.route ? undefined : "5, 8",
+          opacity: 0.85,
+        }}
+      />
+      <Polyline
+        positions={secondLeg}
+        pathOptions={{
+          color: "#facc15",
+          weight: 3.5,
+          dashArray: toDropoff.route ? undefined : "5, 8",
+          opacity: 0.9,
+        }}
+      />
+    </>
+  );
+}
+
+function RouteSummary({
+  start,
+  pickup,
+  dropoff,
+}: {
+  start: { lat: number; lng: number };
+  pickup: { lat: number; lng: number };
+  dropoff: { lat: number; lng: number };
+}) {
+  const toPickup = useTruckRoute(start, pickup);
+  const toDropoff = useTruckRoute(pickup, dropoff);
+
+  const loadedDistance = toDropoff.route
+    ? formatRouteDistance(toDropoff.route.distanceMeters)
+    : "Calculating…";
+  const loadedDuration = toDropoff.route
+    ? formatRouteDuration(toDropoff.route.durationSeconds)
+    : "—";
+  const deadheadDistance = toPickup.route
+    ? formatRouteDistance(toPickup.route.distanceMeters)
+    : "Calculating…";
+
+  return (
+    <div className="mt-3 border-t border-border pt-2.5 space-y-1.5 text-[11px]">
+      <div className="flex justify-between">
+        <span className="text-muted-foreground">Deadhead to pickup:</span>
+        <span className="font-medium text-foreground">{deadheadDistance}</span>
+      </div>
+      <div className="flex justify-between">
+        <span className="text-muted-foreground">Loaded route:</span>
+        <span className="font-medium text-foreground">
+          {loadedDistance} · {loadedDuration}
+        </span>
+      </div>
     </div>
   );
 }
@@ -165,10 +311,12 @@ function FitMapBounds({ drivers }: { drivers: DriverMapData[] }) {
   useEffect(() => {
     if (drivers.length === 0) return;
 
-    const bounds = L.latLngBounds(drivers.map(d => [d.lat, d.lng] as [number, number]));
-    
+    const bounds = L.latLngBounds(
+      drivers.map((d) => [d.lat, d.lng] as [number, number]),
+    );
+
     // Also include load dropoff points so the route lines aren't cut off
-    drivers.forEach(d => {
+    drivers.forEach((d) => {
       if (d.activeRoute) {
         bounds.extend([d.activeRoute.dropoff.lat, d.activeRoute.dropoff.lng]);
         bounds.extend([d.activeRoute.pickup.lat, d.activeRoute.pickup.lng]);

@@ -5,7 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -49,10 +51,10 @@
   /* DispatchIQ — dark navy ops console */
   --radius: 0.5rem;
 
-  --background: oklch(0.18 0.04 250);            /* #0A1628 */
+  --background: oklch(0.18 0.04 250); /* #0A1628 */
   --foreground: oklch(0.97 0.005 250);
-  --surface: oklch(0.22 0.04 250);               /* card surface */
-  --surface-2: oklch(0.20 0.04 250);             /* sidebar */
+  --surface: oklch(0.22 0.04 250); /* card surface */
+  --surface-2: oklch(0.2 0.04 250); /* sidebar */
   --table-row-alt: oklch(0.235 0.04 250);
 
   --card: oklch(0.22 0.04 250);
@@ -60,40 +62,40 @@
   --popover: oklch(0.22 0.04 250);
   --popover-foreground: oklch(0.97 0.005 250);
 
-  --primary: oklch(0.62 0.20 260);               /* electric blue #2B6FEB */
+  --primary: oklch(0.62 0.2 260); /* electric blue #2B6FEB */
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.27 0.04 250);
   --secondary-foreground: oklch(0.97 0.005 250);
 
   --muted: oklch(0.27 0.03 250);
-  --muted-foreground: oklch(0.70 0.02 250);
-  --accent: oklch(0.30 0.05 255);
+  --muted-foreground: oklch(0.7 0.02 250);
+  --accent: oklch(0.3 0.05 255);
   --accent-foreground: oklch(0.97 0.005 250);
 
   --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --success: oklch(0.72 0.18 145);               /* #22C55E */
+  --success: oklch(0.72 0.18 145); /* #22C55E */
   --success-foreground: oklch(0.15 0.04 250);
-  --warning: oklch(0.80 0.16 85);                /* amber */
+  --warning: oklch(0.8 0.16 85); /* amber */
   --warning-foreground: oklch(0.18 0.04 250);
-  --danger: oklch(0.65 0.22 25);                 /* red */
+  --danger: oklch(0.65 0.22 25); /* red */
   --danger-foreground: oklch(0.99 0 0);
 
-  --border: oklch(0.32 0.04 250);                /* #1E3A5F-ish */
+  --border: oklch(0.32 0.04 250); /* #1E3A5F-ish */
   --input: oklch(0.27 0.04 250);
-  --ring: oklch(0.62 0.20 260);
+  --ring: oklch(0.62 0.2 260);
 
-  --chart-1: oklch(0.62 0.20 260);
+  --chart-1: oklch(0.62 0.2 260);
   --chart-2: oklch(0.72 0.18 145);
-  --chart-3: oklch(0.80 0.16 85);
+  --chart-3: oklch(0.8 0.16 85);
   --chart-4: oklch(0.65 0.22 25);
-  --chart-5: oklch(0.70 0.10 220);
+  --chart-5: oklch(0.7 0.1 220);
 
-  --sidebar: oklch(0.20 0.04 250);               /* #0D1F35 */
-  --sidebar-foreground: oklch(0.90 0.01 250);
+  --sidebar: oklch(0.2 0.04 250); /* #0D1F35 */
+  --sidebar-foreground: oklch(0.9 0.01 250);
   --sidebar-accent: oklch(0.27 0.04 250);
-  --sidebar-border: oklch(0.30 0.04 250);
+  --sidebar-border: oklch(0.3 0.04 250);
 }
 
 @layer base {
@@ -101,7 +103,8 @@
     border-color: var(--color-border);
   }
 
-  html, body {
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
@@ -115,14 +118,24 @@
     background-color: var(--color-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    box-shadow: 0 1px 2px 0 oklch(0 0 0 / 0.4), 0 4px 12px -2px oklch(0 0 0 / 0.25);
+    box-shadow:
+      0 1px 2px 0 oklch(0 0 0 / 0.4),
+      0 4px 12px -2px oklch(0 0 0 / 0.25);
   }
 
   .map-grid {
     background-color: oklch(0.16 0.03 250);
     background-image:
-      linear-gradient(to right, oklch(0.26 0.04 250 / 0.5) 1px, transparent 1px),
-      linear-gradient(to bottom, oklch(0.26 0.04 250 / 0.5) 1px, transparent 1px);
+      linear-gradient(
+        to right,
+        oklch(0.26 0.04 250 / 0.5) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        oklch(0.26 0.04 250 / 0.5) 1px,
+        transparent 1px
+      );
     background-size: 40px 40px;
   }
 }
@@ -140,7 +153,9 @@
   color: var(--color-foreground);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.5),
+    0 4px 6px -4px rgb(0 0 0 / 0.5);
   padding: 2px;
 }
 .leaflet-popup.dispatch-popup .leaflet-popup-content {
